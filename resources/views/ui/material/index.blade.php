@@ -54,7 +54,11 @@
                                     <td>{{ 'Rp ' . number_format($data->total, 0, ',', '.') }}</td>
                                     <td>{{ strip_tags($data->ket) }}</td>
                                     <td>
-                                        <a href="{{ asset($data->lampiran) }}" download>Unduh File</a>
+                                        @if($data->lampiran>0)
+                                            <a href="{{ asset($data->lampiran) }}" download>Unduh File</a>
+                                        @else
+                                            <p style="color: red">Tidak Ada Lampiran</p>
+                                        @endif
                                     </td>
 
                                 </tr>

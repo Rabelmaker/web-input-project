@@ -2,15 +2,15 @@
 @section('content')
     <div class="page-header">
         <div>
-            <h2 class="main-content-title tx-24 mg-b-5">Data Pinjaman</h2>
+            <h2 class="main-content-title tx-24 mg-b-5">Data Laporan</h2>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Data Pinjaman</li>
+                <li class="breadcrumb-item active" aria-current="page">Data Laporan</li>
             </ol>
         </div>
         <div class="d-flex">
             <div class="justify-content-center">
-                <a href="{{ route('add_pinjaman') }}">
+                <a href="{{ route('add_grupLap') }}">
                     <button type="button" class="btn btn-success my-2 btn-icon-text">
                         <i class="fe fe-file-plus me-2"></i> Tambah Data
                     </button>
@@ -28,28 +28,30 @@
                             <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Nama Project</th>
-                                <th>Pinjaman</th>
-                                <th>Tanggal Pinjam</th>
+                                <th>Nama</th>
                                 <th>Keterangan</th>
-                                <th>Lampiran</th>
+                                <th>Aksi</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($datas as $data)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $data->nama_project }}</td>
-                                    <td>{{ 'Rp ' . number_format($data->total, 0, ',', '.') }}</td>
-                                    <td>{{ $data->tgl }}</td>
-                                    <td>{{ strip_tags($data->ket) }}</td>
+                                    <td>{{ $data->nama_laporan }}</td>
+                                    <td>{{ $data->ket }}</td>
                                     <td>
-                                        @if($data->lampiran>0)
-                                            <a href="{{ asset($data->lampiran) }}" download>Unduh File</a>
-                                        @else
-                                            <p style="color: red">Tidak Ada Lampiran</p>
-                                        @endif
+                                        <a href="{{ route('delete_grupLap', $data->id) }}">
+                                            <button type="button" class="btn btn-outline-danger my-2 btn-icon-text">
+                                                <i class="fe fe-trash-2"></i>
+                                            </button>
+                                        </a>
+                                        <a href="{{ route('edit_grupLap', $data->id) }}">
+                                            <button type="button" class="btn btn-outline-primary my-2 btn-icon-text">
+                                                <i class="fe fe-edit-2"></i>
+                                            </button>
+                                        </a>
                                     </td>
+
                                 </tr>
                             @endforeach
                             </tbody>

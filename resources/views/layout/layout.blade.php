@@ -114,44 +114,6 @@ use Illuminate\Support\Facades\Route;
                                 <a class="nav-link icon header-search">
                                     <i class="fe fe-search header-icons"></i>
                                 </a>
-                                <div class="dropdown-menu">
-                                    <div class="main-form-search p-2">
-                                        <div class="input-group">
-                                            <div class="input-group-btn search-panel">
-                                                <select class="form-control select2">
-                                                    <option label="All categories">
-                                                    </option>
-                                                    <option value="IT Projects">
-                                                        IT Projects
-                                                    </option>
-                                                    <option value="Business Case">
-                                                        Business Case
-                                                    </option>
-                                                    <option value="Microsoft Project">
-                                                        Microsoft Project
-                                                    </option>
-                                                    <option value="Risk Management">
-                                                        Risk Management
-                                                    </option>
-                                                    <option value="Team Building">
-                                                        Team Building
-                                                    </option>
-                                                </select>
-                                            </div>
-                                            <input type="search" class="form-control"
-                                                   placeholder="Search for anything...">
-                                            <button class="btn search-btn">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                     width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                                     stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                     stroke-linejoin="round" class="feather feather-search">
-                                                    <circle cx="11" cy="11" r="8"></circle>
-                                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                             <!-- Search -->
                             <!-- Theme-Layout -->
@@ -182,24 +144,9 @@ use Illuminate\Support\Facades\Route;
                                 </a>
                                 <div class="dropdown-menu">
                                     <div class="header-navheading">
-                                        <h6 class="main-notification-title">Sonia Taylor</h6>
-                                        <p class="main-notification-text">Web Designer</p>
+                                        <h6 class="main-notification-title">Admin</h6>
+                                        <p class="main-notification-text">Welcome</p>
                                     </div>
-                                    <a class="dropdown-item border-top" href="profile.html">
-                                        <i class="fe fe-user"></i> My Profile
-                                    </a>
-                                    <a class="dropdown-item" href="profile.html">
-                                        <i class="fe fe-edit"></i> Edit Profile
-                                    </a>
-                                    <a class="dropdown-item" href="profile.html">
-                                        <i class="fe fe-settings"></i> Account Settings
-                                    </a>
-                                    <a class="dropdown-item" href="profile.html">
-                                        <i class="fe fe-settings"></i> Support
-                                    </a>
-                                    <a class="dropdown-item" href="profile.html">
-                                        <i class="fe fe-compass"></i> Activity
-                                    </a>
                                     <a class="dropdown-item" href="javascript:void(0);" onclick="logout()">
                                         <i class="fe fe-power"></i> Sign Out
                                     </a>
@@ -252,6 +199,7 @@ use Illuminate\Support\Facades\Route;
                             <ul class="nav-sub">
                                 <li class="side-menu-label1"><a href="javascript:void(0);">Input Data</a></li>
                                 <li class="nav-sub-item"> <a class="nav-sub-link" href="{{route('karyawan')}}">Karyawan</a></li>
+                                <li class="nav-sub-item"> <a class="nav-sub-link" href="{{route('grupLap')}}">Buat Laporan</a></li>
                                 <li class="nav-sub-item"><a class="nav-sub-link" href="{{route('project')}}">Project</a></li>
                                 <li class="nav-sub-item"><a class="nav-sub-link" href="{{route('uangMasuk')}}">Uang Masuk/Keluar</a></li>
                                 <li class="nav-sub-item"><a class="nav-sub-link" href="{{route('material')}}">Material</a></li>
@@ -548,6 +496,22 @@ use Illuminate\Support\Facades\Route;
         }).then((result) => {
             if(result.value){
                 var url = '{{ route('logout') }}';
+                location.replace(url);
+            }
+        });
+    }
+    function reset() {
+        Swal.fire({
+            title: 'Anda yakin !',
+            text: "Ingin mereset saldo akhir ?",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Reset'
+        }).then((result) => {
+            if(result.value){
+                var url = '#';
                 location.replace(url);
             }
         });

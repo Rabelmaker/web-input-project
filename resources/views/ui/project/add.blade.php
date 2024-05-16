@@ -2,10 +2,10 @@
 @section('content')
     <div class="page-header">
         <div>
-            <h2 class="main-content-title tx-24 mg-b-5">Tambah Karyawan</h2>
+            <h2 class="main-content-title tx-24 mg-b-5">Tambah Project</h2>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Tambah Karyawan</li>
+                <li class="breadcrumb-item active" aria-current="page">Tambah Project</li>
             </ol>
         </div>
 

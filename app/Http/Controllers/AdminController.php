@@ -202,11 +202,15 @@ class AdminController extends Controller
     }
     public function add_uangMasuk()
     {
+        $laporan = DB::table('laporan_tb')
+            ->select('nama_laporan','id')
+            ->get();
+
         $data = DB::table('project_tb')
             ->select('nama_project','id')
             ->get();
 
-        return view('ui.uang_masuk.add', ['datas' => $data]);
+        return view('ui.uang_masuk.add', ['datas' => $data],['laporans' => $laporan]);
     }
     public function edit_uangMasuk($id)
     {
@@ -225,6 +229,7 @@ class AdminController extends Controller
 
         $data = [
             'id_project' => $request->id_project,
+            'id_laporan' => $request->id_laporan,
             'total' => $request->total,
             'uraian' => $request->isMasuk == 1 ? "Uang Masuk" : "Uang Keluar",
             'adm_bank' => $request->adm_bank,
@@ -232,7 +237,7 @@ class AdminController extends Controller
             'ket' => $request->ket,
             'jenis_transaksi' => 'uang keluar/masuk',
             'isMasuk' => $request->isMasuk,
-            'saldo_akhir' => $this->saldoAkhir($request->total, $request->isMasuk)
+            'saldo_akhir' => $this->saldoAkhir($request->total, $request->isMasuk,$request->id_laporan)
         ];
 
 
@@ -282,11 +287,15 @@ class AdminController extends Controller
     }
     public function add_material()
     {
+        $laporan = DB::table('laporan_tb')
+            ->select('nama_laporan','id')
+            ->get();
+
         $data = DB::table('project_tb')
             ->select('nama_project','id')
             ->get();
 
-        return view('ui.material.add', ['datas' => $data]);
+        return view('ui.material.add', ['datas' => $data],['laporans' => $laporan]);
     }
     public function edit_material($id)
     {
@@ -307,102 +316,18 @@ class AdminController extends Controller
         $adm_bank = $request->adm_bank;
         $data = [
             'id_project' => $request->id_project,
+            'id_laporan' => $request->id_laporan,
             'tgl' => $request->tgl,
             'uraian' => $request->uraian,
             'jumlah' => $jumlah,
             'satuan' => $satuan,
             'harga' => $harga,
             'adm_bank' => $adm_bank,
-            'total' => $jumlah*$harga,
+            'total' => ($jumlah*$harga)+$adm_bank,
             'ket' => $request->ket,
             'jenis_transaksi' => 'material',
             'isMasuk' => 0,
-            'saldo_akhir' => $this->saldoAkhir($request->total,0)
-        ];
-
-        if ($request->mode === 'add') {
-            $id = DB::table('transaksi_tb')->insertGetId($data);
-        } else {
-            $id = $request->id;
-            DB::table('material_tb')->where('id', $id)->update($data);
-        }
-
-        if ($request->has('lampiran')) {
-
-            request()->validate([
-                'lampiran' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5000',
-            ]);
-
-            $file = $request->file('lampiran');
-            $tujuan = "img/lampiran";
-            $nama = date('YmdHis') . "." . $file->getClientOriginalExtension();
-            $file->move($tujuan, $nama);
-
-            DB::table('transaksi_tb')
-                ->where('id', $id)
-                ->update(['lampiran' => "$tujuan/$nama"]);
-        }
-
-        return redirect(route('material'))->with('sukses', 'Material telah di perbarui');
-    }
-    public function delete_material($id)
-    {
-        DB::table('material_tb')
-            ->where('id', $id)
-            ->delete();
-
-        return redirect(route('material'))->with('sukses', 'Material telah di hapus');
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    public function jasa()
-    {
-        $data = DB::table('transaksi_tb')
-            ->leftJoin('project_tb', 'transaksi_tb.id_project', '=', 'project_tb.id')
-            ->where('transaksi_tb.jenis_transaksi','=','jasa')
-            ->get();
-
-        return view('ui.jasa.index', ['datas' => $data]);
-    }
-    public function add_jasa()
-    {
-        $data = DB::table('project_tb')
-            ->select('nama_project','id')
-            ->get();
-
-        return view('ui.jasa.add', ['datas' => $data]);
-    }
-    public function edit_jasa($id)
-    {
-        $data = DB::table('transaksi_tb')
-            ->where('transaksi_tb.id', $id)
-            ->first();
-
-        $project = DB::table('project_tb')
-            ->get();
-
-        return view('ui.jasa.edit', ['data' => $data, 'projects' => $project]);
-    }
-    public function post_jasa(Request $request)
-    {
-        $jumlah = $request->jumlah;
-        $satuan = $request->satuan;
-        $harga = $request->harga;
-        $adm_bank = $request->adm_bank;
-        $data = [
-            'id_project' => $request->id_project,
-            'tgl' => $request->tgl,
-            'tgl_end'=> $request->tgl_end,
-            'uraian' => $request->uraian,
-            'jumlah' => $jumlah,
-            'satuan' => $satuan,
-            'harga' => $harga,
-            'adm_bank' => $adm_bank,
-            'total' => $jumlah*$harga,
-            'ket' => $request->ket,
-            'jenis_transaksi' => 'jasa',
-            'isMasuk' => 0,
-            'saldo_akhir' => $this->saldoAkhir($request->total,0)
+            'saldo_akhir' => $this->saldoAkhir(($jumlah*$harga)+$adm_bank,0,$request->id_laporan)
         ];
 
         if ($request->mode === 'add') {
@@ -428,6 +353,98 @@ class AdminController extends Controller
                 ->update(['lampiran' => "$tujuan/$nama"]);
         }
 
+        return redirect(route('material'))->with('sukses', 'Material telah di perbarui');
+    }
+    public function delete_material($id)
+    {
+        DB::table('transaksi_tb')
+            ->where('id', $id)
+            ->delete();
+
+        return redirect(route('material'))->with('sukses', 'Material telah di hapus');
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    public function jasa()
+    {
+        $data = DB::table('transaksi_tb')
+            ->leftJoin('project_tb', 'transaksi_tb.id_project', '=', 'project_tb.id')
+            ->where('transaksi_tb.jenis_transaksi','=','jasa')
+            ->get();
+
+        return view('ui.jasa.index', ['datas' => $data]);
+    }
+    public function add_jasa()
+    {
+        $laporan = DB::table('laporan_tb')
+            ->select('nama_laporan','id')
+            ->get();
+
+        $data = DB::table('project_tb')
+            ->select('nama_project','id')
+            ->get();
+
+        return view('ui.jasa.add', ['datas' => $data],['laporans' => $laporan]);
+    }
+    public function edit_jasa($id)
+    {
+        $data = DB::table('transaksi_tb')
+            ->where('transaksi_tb.id', $id)
+            ->first();
+
+        $project = DB::table('project_tb')
+            ->get();
+
+        return view('ui.jasa.edit', ['data' => $data, 'projects' => $project]);
+    }
+    public function post_jasa(Request $request)
+    {
+        $jumlah = $request->jumlah;
+        $satuan = $request->satuan;
+        $harga = $request->harga;
+        $adm_bank = $request->adm_bank;
+        $data = [
+            'id_project' => $request->id_project,
+            'id_laporan' => $request->id_laporan,
+            'tgl' => $request->tgl,
+            'tgl_end'=> $request->tgl_end,
+            'uraian' => $request->uraian,
+            'jumlah' => $jumlah,
+            'satuan' => $satuan,
+            'harga' => $harga,
+            'adm_bank' => $adm_bank,
+            'total' => $jumlah*$harga,
+            'ket' => $request->ket,
+            'jenis_transaksi' => 'jasa',
+            'isMasuk' => 0,
+            'saldo_akhir' => $this->saldoAkhir($request->total,0,$request->id_laporan)
+        ];
+
+        if ($request->mode === 'add') {
+            $id = DB::table('transaksi_tb')->insertGetId($data);
+        } else {
+            $id = $request->id;
+            DB::table('transaksi_tb')->where('id', $id)->update($data);
+        }
+
+        if ($request->has('lampiran')) {
+
+            request()->validate([
+                'lampiran' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5000',
+            ]);
+
+            $file = $request->file('lampiran');
+            $tujuan = "img/lampiran";
+            $nama = date('YmdHis') . "." . $file->getClientOriginalExtension();
+            $file->move($tujuan, $nama);
+
+            DB::table('transaksi_tb')
+                ->where('id', $id)
+                ->update(['lampiran' => "$tujuan/$nama"]);
+        }
+
+        dd($data);
+
         return redirect(route('jasa'))->with('sukses', 'Jasa telah di perbarui');
     }
     public function delete_jasa($id)
@@ -449,12 +466,17 @@ class AdminController extends Controller
 
         return view('ui.pinjaman.index', ['datas' => $data]);
     }
-    public function add_pinjaman(){
+    public function add_pinjaman()
+    {
+        $laporan = DB::table('laporan_tb')
+            ->select('nama_laporan','id')
+            ->get();
+
         $data = DB::table('project_tb')
             ->select('nama_project','id')
             ->get();
 
-        return view('ui.pinjaman.add', ['datas' => $data]);
+        return view('ui.pinjaman.add', ['datas' => $data],['laporans' => $laporan]);
     }
     public function edit_pinjaman($id)
     {
@@ -471,13 +493,14 @@ class AdminController extends Controller
     {
         $data = [
             'id_project' => $request->id_project,
+            'id_laporan' => $request->id_laporan,
             'total' => $request->total,
             'uraian' => "Pinjaman",
             'tgl' => $request->tgl,
             'ket' => $request->ket,
             'jenis_transaksi' => 'pinjaman',
             'isMasuk' => 0,
-            'saldo_akhir' => $this->saldoAkhir($request->total,0)
+            'saldo_akhir' => $this->saldoAkhir($request->total,0,$request->id_laporan)
         ];
 
         if ($request->mode === 'add') {
@@ -515,22 +538,96 @@ class AdminController extends Controller
     }
 
     //------------------------------------------------------------------------------------------------------------------
+
+    public function grupLap()
+    {
+        $data = DB::table('laporan_tb')->get();
+        return view('ui.grupLap.index', ['datas' => $data]);
+    }
+
+    public function add_grupLap()
+    {
+        return view('ui.grupLap.add');
+    }
+
+    public function edit_grupLap($id)
+    {
+        $data = DB::table('laporan_tb')->where('id', $id)->first();
+        return view('ui.grupLap.edit', ['data' => $data]);
+    }
+
+    public function post_grupLap(Request $request)
+    {
+        $data = [
+            'nama_laporan' => $request->nama_laporan,
+            'ket' => $request->ket,
+        ];
+
+        if ($request->mode === 'add') {
+            $id = DB::table('laporan_tb')->insertGetId($data);
+        } else {
+            $id = $request->id;
+            DB::table('laporan_tb')->where('id', $id)->update($data);
+        }
+
+        if ($request->has('gambar')) {
+
+            request()->validate([
+                'gambar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5000',
+            ]);
+
+            $file = $request->file('gambar');
+            $tujuan = "img/photo";
+            $nama = date('YmdHis') . "." . $file->getClientOriginalExtension();
+            $file->move($tujuan, $nama);
+
+            DB::table('laporan_tb')
+                ->where('id', $id)
+                ->update(['gambar' => "$tujuan/$nama"]);
+        }
+
+        return redirect(route('grupLap'))->with('sukses', 'Laporan telah di perbarui');
+    }
+
+    public function delete_grupLap($id)
+    {
+        DB::table('laporan_tb')
+            ->where('id', $id)
+            ->delete();
+
+        return redirect(route('grupLap'))->with('sukses', 'Laporan telah di hapus');
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
     public function laporan()
     {
-        $data = DB::table('transaksi_tb')
-            ->leftJoin('project_tb', 'transaksi_tb.id_project', '=', 'project_tb.id')
+        $data = DB::table('laporan_tb')
             ->get();
 
         return view('ui.laporan.index', ['datas' => $data]);
     }
+    public function detail_laporan($id)
+    {
+        $data = DB::table('transaksi_tb')
+            ->leftJoin('laporan_tb', 'transaksi_tb.id_laporan', '=', 'laporan_tb.id')
+            ->leftJoin('project_tb', 'transaksi_tb.id_project', '=', 'project_tb.id')
+            ->where('laporan_tb.id', $id)
+            ->get();
+
+        return view('ui.laporan.detail', ['datas' => $data]);
+    }
     //------------------------------------------------------------------------------------------------------------------
+
+    //------------------------------------------------------------------------------------------------------------------
+
     function idAdmin()
     {
         return Auth::guard('admin')->user()->id;
     }
 
-    function saldoAkhir($jumlah,$isMasuk){
+    function saldoAkhir($jumlah,$isMasuk,$id_laporan){
         $x = DB::table('transaksi_tb')
+            ->where('id_laporan',$id_laporan)
             ->orderBy('id','desc')
             ->get();
 

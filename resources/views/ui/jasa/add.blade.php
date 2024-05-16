@@ -49,6 +49,21 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-12 col-lg-12 col-xl-12">
+                                <div class="">
+                                    <div class="form-group">
+                                        <label class="">Nama Laporan</label>
+                                        <div class="form-group ">
+                                            <select class="form-control select2" name="id_laporan">
+                                                <option value="">Pilih Laporan</option>
+                                                @foreach($laporans as $laporan)
+                                                    <option value="{{ $laporan->id }}">{{ $laporan->nama_laporan }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-12 col-lg-2 col-xl-2">
                                 <div class="">
                                     <div class="form-group">

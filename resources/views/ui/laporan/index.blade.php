@@ -19,36 +19,14 @@
                             <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Nama Project</th>
-                                <th>Tanggal</th>
-                                <th>Uraian</th>
-                                <th>Uang Masuk</th>
-                                <th>Uang Keluar</th>
-                                <th>ADM Bank</th>
-                                <th>Saldo Akhir</th>
-                                <th>Keterangan</th>
+                                <th>Nama Laporan</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($datas as $data)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $data->nama_project }}</td>
-                                    <td>{{ $data->tgl }}</td>
-                                    <td>{{ $data->uraian }}</td>
-                                    <td>@if($data->isMasuk == '1' )
-                                            {{'Rp ' . number_format($data->total, 0, ',', '.')}}
-                                        @else
-                                            -
-                                        @endif</td>
-                                    <td>@if($data->isMasuk == '0' )
-                                            {{'Rp ' . number_format($data->total, 0, ',', '.')}}
-                                        @else
-                                            -
-                                        @endif</td>
-                                    <td>{{'Rp ' . number_format($data->adm_bank, 0, ',', '.')}}</td>
-                                    <td>{{'Rp ' . number_format($data->saldo_akhir, 0, ',', '.')}}</td>
-                                    <td>{{ strip_tags($data->ket) }}</td>
+                                    <td><a href="{{route('detail_laporan',$data->id)}}">{{ $data->nama_laporan }}</a></td>
                                 </tr>
                             @endforeach
                             </tbody>
